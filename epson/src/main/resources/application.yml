@@ -11,7 +11,7 @@ spring:
       max-file-size: 50MB
 
 server:
-  port: 80
+  port: 8080
   # Mock Mvc test response
   servlet:
     encoding:
@@ -32,7 +32,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mariadb://localhost:3306/projectName?createDatabaseIfNotExist=true
+    url: jdbc:mariadb://localhost:3306/lexi?createDatabaseIfNotExist=true
     username: root
     password: 1234
     driver-class-name: org.mariadb.jdbc.Driver
@@ -58,6 +58,5 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-
 
 
