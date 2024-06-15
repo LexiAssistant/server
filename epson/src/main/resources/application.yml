@@ -43,6 +43,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+tesseract:
+  jna-path: /opt/homebrew/opt/tesseract/lib
+  language-path : /Users/chlee/Downloads/tessdata_best
+  file-path : /Users/chlee/Downloads/
 ---
 # prod
 spring:
@@ -59,4 +64,8 @@ spring:
       ddl-auto: update
     show-sql: false
 
+tesseract:
+  jna-path: ${JNA_PATH}
+  language-path : ${LANGUAGE_PATH}
+  file-path : ${FILE_PATH}
 
