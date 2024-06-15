@@ -45,7 +45,6 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)//FormLogin, BasicHttp 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        .anyRequest().hasAnyAuthority()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증 요구
                 )
 //                .exceptionHandling(ex -> ex

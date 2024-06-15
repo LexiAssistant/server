@@ -13,7 +13,7 @@ public class UserDTO {
 
     public UserEntity toUserEntity()
     {
-        return new UserEntity( 0L,  this.email, this.password);
+        return new UserEntity(this.email, this.password);
     }
 
 }

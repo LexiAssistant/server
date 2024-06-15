@@ -14,5 +14,4 @@ public class TokenPairResponseDTO {
 
     String accessToken;
     String refreshToken;
-    String state;
 }

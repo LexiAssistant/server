@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Getter @NoArgsConstructor @AllArgsConstructor
+@ToString
 public class UserEntity implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "password")
     private String password;
 
+
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -32,12 +37,12 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.email;
     }
 
     @Override
@@ -63,6 +68,11 @@ public class UserEntity implements UserDetails {
 
     public UserDTO toUserDTO(){
         return new UserDTO(this.email, this.password);
+    }
+
+    public UserEntity(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
 }

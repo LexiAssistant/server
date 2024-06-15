@@ -7,52 +7,64 @@ import dev.changuii.project.entity.UserEntity;
 import dev.changuii.project.repository.UserRepository;
 import dev.changuii.project.security.service.JwtProvider;
 import dev.changuii.project.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
 
     @Override
-    public TokenPairResponseDTO signup(UserDTO userDTO) {
+    @Transactional
+    public ResponseEntity<TokenPairResponseDTO> signup(UserDTO userDTO) {
+
 
         if(!userRepository.existsByEmail(userDTO.getEmail()))
         {
+            log.info(userDTO.toString());
             UserEntity user = userDTO.toUserEntity();
+            log.info(user.toString());
             userRepository.save(user);
 
-            return new TokenPairResponseDTO(
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(new TokenPairResponseDTO(
                     jwtProvider.createAccessToken(user.getUserPK().toString()),
-                    jwtProvider.createRefreshToken(user.getUserPK().toString()),
-                    "OK"
-            );
+                    jwtProvider.createRefreshToken(user.getUserPK().toString())
+                    ));
         }
 
-        return new TokenPairResponseDTO(
-                "","","Already exist Email"
-        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new TokenPairResponseDTO());
 
     }
 
     @Override
-    public TokenPairResponseDTO login(UserDTO userDTO) {
-        try {
-            UserEntity user = userRepository.findByEmail(userDTO.getEmail());
-            if(user.getPassword().equals(userDTO.getPassword())
-                    && user.getPassword().equals(userDTO.getPassword())){
-                return new TokenPairResponseDTO(
-                        jwtProvider.createAccessToken(user.getUserPK().toString()),
-                        jwtProvider.createRefreshToken(user.getUserPK().toString()),
-                        "OK");
-            }
-        }catch (Exception e){
-            //TODO: 예외정의
+    public ResponseEntity<TokenPairResponseDTO> login(UserDTO userDTO) {
+        UserEntity user = userRepository.findByEmail(userDTO.getEmail());
+        log.info(userDTO.toString());
+        log.info(user.toString());
+        if (user.getEmail().equals(userDTO.getEmail()) && user.getPassword().equals(userDTO.getPassword())){
+            log.info("인증성공");
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new TokenPairResponseDTO(
+                    jwtProvider.createAccessToken(user.getUserPK().toString()),
+                    jwtProvider.createRefreshToken(user.getUserPK().toString())));
         }
-        return null;
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenPairResponseDTO());
     }
+
 }
