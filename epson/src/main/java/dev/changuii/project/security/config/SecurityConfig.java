@@ -32,6 +32,7 @@ public class SecurityConfig {
             "/api/auth/signin", //로그인
             "/api/auth/signup", //회원가입
             "/error/**", // Custom exception
+            "/sample/**"
     };
 
     @Bean
