@@ -1,4 +1,4 @@
-package dev.changuii.project.entity;
+package dev.changuii.project.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

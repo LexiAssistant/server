@@ -1,6 +1,7 @@
 package dev.changuii.project.entity;
 
 
+import dev.changuii.project.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,8 +19,8 @@ public class UserEntity implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userPK;
 
-    @Column(name = "eamil")
-    private String eamil;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password")
     private String password;
@@ -58,4 +59,10 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
+
+    public UserDTO toUserDTO(){
+        return new UserDTO(this.email, this.password);
+    }
+
 }

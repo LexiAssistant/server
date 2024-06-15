@@ -24,7 +24,7 @@ public class JwtProvider {
     Logger log = LoggerFactory.getLogger(JwtProvider.class);
 
     //TODO: 환경변수로 바꿔야함
-    private String secretKey = "secretKey";
+    private String secretKey = "598552aaff8e56c91489540619ab3cb62fa2ae044a1158b9562464a606f9e820";
 
     private final long accessTokenValidMillisecond = 1000L * 10 * 60; // 10분
     private final long refreshTokenValidMillisecond = 1000L * 60 * 60; // 1시간
@@ -37,9 +37,8 @@ public class JwtProvider {
     }
 
     // JWT access token 생성
-    public String createAccessToken(String userPk, List<String> roles) {
+    public String createAccessToken(String userPk) {
         Claims claims = Jwts.claims().setSubject(userPk);
-        claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)      // 데이터
@@ -50,9 +49,8 @@ public class JwtProvider {
     }
 
     // JWT refresh token 생성
-    public String createRefreshToken(String userPk, List<String> roles) {
+    public String createRefreshToken(String userPk) {
         Claims claims = Jwts.claims().setSubject(userPk);
-        claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)      // 데이터
