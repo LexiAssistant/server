@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,6 +30,10 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "device_id")
     private String deviceId;
+
+    @OneToMany(mappedBy = "user")
+    @JoinColumn
+    private List<ImageEntity> images = new ArrayList<>();
 
 
 
