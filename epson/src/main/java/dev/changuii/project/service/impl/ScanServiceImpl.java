@@ -16,9 +16,6 @@ public class ScanServiceImpl implements ScanService {
 
     private final WebClient webClient;
 
-    @Value("${apson.api-key}")
-    private String key;
-
     public ScanServiceImpl(
             @Autowired WebClient.Builder webClientBuilder
     ){

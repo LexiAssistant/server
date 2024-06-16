@@ -3,10 +3,7 @@ package dev.changuii.project.entity;
 
 import dev.changuii.project.dto.UserDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter @NoArgsConstructor @AllArgsConstructor
-@ToString
+@ToString @Builder
 public class UserEntity implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,5 +77,15 @@ public class UserEntity implements UserDetails {
         this.email = email;
         this.password = password;
     }
+
+    public static UserEntity epsonAuthenticationStore(UserEntity user, String epsonToken, String deviceId){
+        return UserEntity.builder()
+                .email(user.getEmail())
+                .userPK(user.getUserPK())
+                .password(user.getPassword())
+                .epsonToken(epsonToken)
+                .deviceId(deviceId).build();
+    }
+
 
 }
