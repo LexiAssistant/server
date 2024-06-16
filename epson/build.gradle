@@ -41,6 +41,9 @@ dependencies {
 	implementation 'net.java.dev.jna:jna-platform:5.8.0'
 	implementation 'net.sourceforge.tess4j:tess4j'
 
+	// Web Client
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	// query dsl 버전 명시해야 jakarta사용 (javax X)
 	implementation 'com.querydsl:querydsl-apt:5.0.0'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

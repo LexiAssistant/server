@@ -44,6 +44,10 @@ spring:
       hibernate:
         format_sql: true
 
+
+epson:
+  api-key: Basic OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA==
+
 tesseract:
   jna-path: /opt/homebrew/opt/tesseract/lib
   language-path : /Users/chlee/Downloads/tessdata_best
@@ -63,6 +67,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+
+epson:
+  api-key: Basic OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA==
 
 tesseract:
   jna-path: ${JNA_PATH}
