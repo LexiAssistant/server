@@ -68,7 +68,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean epsonAuthentication(String printerEmail) {
+    public Boolean epsonAuthentication(String printerEmail, String email) {
+
+
         return false;
     }
 

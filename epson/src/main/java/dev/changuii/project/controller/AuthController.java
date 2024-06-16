@@ -34,4 +34,13 @@ public class AuthController {
         return userServiceImpl.signup(userDTO);
     }
 
+
+    @PostMapping("/epson/{printerEmail}/{email}")
+    public ResponseEntity<Boolean> epsonAuthentication(
+            @PathVariable("printerEmail") String printerEmail,
+            @PathVariable("email") String email
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userServiceImpl.epsonAuthentication(printerEmail, email))
+    }
+
 }
