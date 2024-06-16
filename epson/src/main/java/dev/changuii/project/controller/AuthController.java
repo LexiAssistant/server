@@ -48,7 +48,7 @@ public class AuthController {
             @PathVariable("printerEmail") String printerEmail,
             @PathVariable("email") String email
     ) {
-        return this.userServiceImpl.epsonAuthentication(printerEmail, email)
+        return this.userService.epsonAuthentication(printerEmail, email)
                 .map(success -> {
                     if (success) {
                         return ResponseEntity.status(HttpStatus.CREATED).body(true);

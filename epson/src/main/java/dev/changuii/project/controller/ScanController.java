@@ -22,12 +22,12 @@ public class ScanController {
     }
 
 
-    @PostMapping("/auth-regi/{email}")
-    public ResponseEntity<?> authenticationAndRegistration(
-            @PathVariable("email") String email
-    ){
-        this.scanService.authenticationAndRegisterDestination(email);
-    }
+//    @PostMapping("/auth-regi/{email}")
+//    public ResponseEntity<?> authenticationAndRegistration(
+//            @PathVariable("email") String email
+//    ){
+//        this.scanService.authenticationAndRegisterDestination(email);
+//    }
 
 
 }

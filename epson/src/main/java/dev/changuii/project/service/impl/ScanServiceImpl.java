@@ -28,19 +28,6 @@ public class ScanServiceImpl implements ScanService {
 
 
         // 인증
-        this.webClient.post()
-                .uri("/printing/oauth2/auth/token?subject=printer")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("Authorization", key )
-                .body(BodyInserters.fromFormData("password", "")
-                        .with("grant_type", "password").with("username", email))
-                .retrieve()
-                .bodyToMono(LinkedHashMap.class)
-                .flatMap(authData->{
-                        String token = (String) authData.get("access_token");
-                        String deviceId = (String) authData.get("subject_id");
-
-                });
 
 
         // 스캔 목적지 등록
