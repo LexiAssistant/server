@@ -32,7 +32,6 @@ public class UserEntity implements UserDetails {
     private String deviceId;
 
     @OneToMany(mappedBy = "user")
-    @JoinColumn
     private List<ImageEntity> images = new ArrayList<>();
 
 

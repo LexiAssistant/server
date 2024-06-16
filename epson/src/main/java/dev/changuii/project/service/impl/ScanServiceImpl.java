@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class ScanServiceImpl implements ScanService {
         scanDestination = new LinkedHashMap<>();
         scanDestination.put("alias_name", "lexiAssistance");
         scanDestination.put("type", "url");
-        scanDestination.put("destination", host + "/email");
+        scanDestination.put("destination", host + "/"+email);
 
         // 인증 토큰 가져오기
         UserEntity user = this.userRepository.findByEmail(email)
@@ -84,7 +85,27 @@ public class ScanServiceImpl implements ScanService {
 
         for(MultipartFile f : files){
             ImageEntity image = ImageEntity.builder().image(f.getBytes()).user(user).build();
+            image = this.imageRepository.save(image);
+            // 경로 저장
+            image.setImageUrl(host + "/download/" + image.getId());
             this.imageRepository.save(image);
         }
+    }
+
+    @Override
+    public byte[] downloadScanData(Long id) {
+        return this.imageRepository.findById(id)
+                .orElseThrow(CustomException::new).getImage();
+    }
+
+    @Override
+    public List<String> downloadUserScanData(String email) {
+        List<String> urls = new ArrayList<>();
+        UserEntity user = this.userRepository.findByEmail(email)
+                .orElseThrow(CustomException::new);
+        for(ImageEntity i : user.getImages()) {
+            urls.add(i.getImageUrl());
+        }
+        return urls;
     }
 }

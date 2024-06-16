@@ -12,4 +12,7 @@ public interface ScanService {
 
     public void uploadScanData(List<MultipartFile> files, String email) throws IOException;
 
+    public byte[] downloadScanData(Long id);
+    public List<String> downloadUserScanData(String email);
+
 }

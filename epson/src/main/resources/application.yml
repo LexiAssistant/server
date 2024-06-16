@@ -7,10 +7,14 @@ spring:
   # multipart form-data 크기 지정
   servlet:
     multipart:
-      max-request-size: 50MB
-      max-file-size: 50MB
+      max-request-size: 1GB
+      max-file-size: 1GB
+
+
 
 server:
+  tomcat:
+    max-http-form-post-size: 1GB
   port: 8080
   # Mock Mvc test response
   servlet:
@@ -38,7 +42,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
