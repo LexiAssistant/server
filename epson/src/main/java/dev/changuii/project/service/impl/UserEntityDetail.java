@@ -1,5 +1,6 @@
-package dev.changuii.project.service;
+package dev.changuii.project.service.impl;
 
+import dev.changuii.project.exception.CustomException;
 import dev.changuii.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,6 @@ public class UserEntityDetail implements UserDetailsService {
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username);
+        return userRepository.findByEmail(username).orElseThrow(CustomException::new);
     }
 }

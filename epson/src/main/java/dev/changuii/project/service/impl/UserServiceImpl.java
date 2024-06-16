@@ -1,6 +1,7 @@
 package dev.changuii.project.service.impl;
 
 
+import dev.changuii.project.dto.AccessTokenResponseDTO;
 import dev.changuii.project.dto.TokenPairResponseDTO;
 import dev.changuii.project.dto.UserDTO;
 import dev.changuii.project.entity.UserEntity;
@@ -69,6 +70,18 @@ public class UserServiceImpl implements UserService {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenPairResponseDTO());
     }
+
+    @Override
+    public ResponseEntity<AccessTokenResponseDTO> issueAccessToken(String email) {
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new AccessTokenResponseDTO(
+                        jwtProvider.createAccessToken(user.getUserPK().toString())
+                ));
+    }
+
 
     @Override
     public Boolean epsonAuthentication(String printerEmail, String email) {
