@@ -4,6 +4,7 @@ package dev.changuii.project.service.impl;
 import dev.changuii.project.dto.TokenPairResponseDTO;
 import dev.changuii.project.dto.UserDTO;
 import dev.changuii.project.entity.UserEntity;
+import dev.changuii.project.exception.CustomException;
 import dev.changuii.project.repository.UserRepository;
 import dev.changuii.project.security.service.JwtProvider;
 import dev.changuii.project.service.UserService;
@@ -51,7 +52,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<TokenPairResponseDTO> login(UserDTO userDTO) {
-        UserEntity user = userRepository.findByEmail(userDTO.getEmail());
+        UserEntity user = userRepository.findByEmail(userDTO.getEmail())
+                .orElseThrow(CustomException::new);
+
         log.info(userDTO.toString());
         log.info(user.toString());
         if (user.getEmail().equals(userDTO.getEmail()) && user.getPassword().equals(userDTO.getPassword())){
