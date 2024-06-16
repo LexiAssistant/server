@@ -10,6 +10,7 @@ public interface UserService {
 
     ResponseEntity<TokenPairResponseDTO> signup(UserDTO userDTO);
     ResponseEntity<TokenPairResponseDTO> login(UserDTO userDTO);
+    public ResponseEntity<AccessTokenResponseDTO> issueAccessToken(String email);
 
     ResponseEntity<AccessTokenResponseDTO> issueAccessToken(String email);
 

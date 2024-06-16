@@ -11,9 +11,9 @@ public class PrintServiceImpl implements PrintSetvice {
 
     private final WebClient webClient;
 
-    public PrintServiceImpl(@Autowired WebClient webClient) {
-
-        this. webClient = WebClient.builder().baseUrl("https://api.epsonconnect.com/api/1").build();
+    public PrintServiceImpl(@Autowired WebClient.Builder webClient) {
+        
+        this. webClient = webClient.baseUrl("https://api.epsonconnect.com/api/1").build();
     }
 
 

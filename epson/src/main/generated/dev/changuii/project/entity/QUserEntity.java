@@ -19,7 +19,11 @@ public class QUserEntity extends EntityPathBase<UserEntity> {
 
     public static final QUserEntity userEntity = new QUserEntity("userEntity");
 
+    public final StringPath deviceId = createString("deviceId");
+
     public final StringPath email = createString("email");
+
+    public final StringPath epsonToken = createString("epsonToken");
 
     public final StringPath password = createString("password");
 
