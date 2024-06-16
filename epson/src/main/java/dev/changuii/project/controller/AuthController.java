@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,11 +44,18 @@ public class AuthController {
 
 
     @PostMapping("/epson/{printerEmail}/{email}")
-    public ResponseEntity<Boolean> epsonAuthentication(
+    public Mono<ResponseEntity<Boolean>> epsonAuthentication(
             @PathVariable("printerEmail") String printerEmail,
             @PathVariable("email") String email
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.epsonAuthentication(printerEmail, email));
+        return this.userServiceImpl.epsonAuthentication(printerEmail, email)
+                .map(success -> {
+                    if (success) {
+                        return ResponseEntity.status(HttpStatus.CREATED).body(true);
+                    } else {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+                    }
+                });
     }
 
 
