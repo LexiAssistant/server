@@ -43,6 +43,7 @@ dependencies {
 
 	// Web Client
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 
 	// query dsl 버전 명시해야 jakarta사용 (javax X)
 	implementation 'com.querydsl:querydsl-apt:5.0.0'

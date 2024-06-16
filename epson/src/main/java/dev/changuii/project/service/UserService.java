@@ -12,7 +12,5 @@ public interface UserService {
     ResponseEntity<TokenPairResponseDTO> login(UserDTO userDTO);
     public ResponseEntity<AccessTokenResponseDTO> issueAccessToken(String email);
 
-    ResponseEntity<AccessTokenResponseDTO> issueAccessToken(String email);
-
     public Mono<Boolean> epsonAuthentication(String printerEmail, String email);
 }

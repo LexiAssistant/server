@@ -46,7 +46,7 @@ spring:
 
 
 epson:
-  api-key: Basic OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA==
+  api-key: 'OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA=='
 
 tesseract:
   jna-path: /opt/homebrew/opt/tesseract/lib

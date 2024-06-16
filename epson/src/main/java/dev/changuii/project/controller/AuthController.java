@@ -9,6 +9,7 @@ import dev.changuii.project.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,17 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
     Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
 
+    public AuthController(
+            @Autowired UserService userService
+    ){
+        this.userService = userService;
+    }
 
 
     @PostMapping(value = "/signin")
@@ -48,6 +53,8 @@ public class AuthController {
             @PathVariable("printerEmail") String printerEmail,
             @PathVariable("email") String email
     ) {
+        log.info(email);
+        log.info(printerEmail);
         return this.userService.epsonAuthentication(printerEmail, email)
                 .map(success -> {
                     if (success) {

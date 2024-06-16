@@ -15,9 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final JwtProvider jwtProvider;
     private final WebClient webClient;
 
-    @Value("${apson.api-key}")
+    @Value("${epson.api-key}")
     private String key;
     public UserServiceImpl(
             @Autowired UserRepository userRepository,
@@ -112,18 +110,21 @@ public class UserServiceImpl implements UserService {
 
         return webClient.post()
                 .uri("/printing/oauth2/auth/token?subject=printer")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("Authorization", key )
-                .body(BodyInserters.fromFormData("password", "")
-                        .with("grant_type", "password").with("username", email))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + key)
+                .body(BodyInserters.fromFormData("grant_type", "password")
+                        .with("username", printerEmail))
                 .exchangeToMono(response -> {
                     HttpStatusCode status = response.statusCode();
                     return response.bodyToMono(LinkedHashMap.class)
                             .flatMap(body -> {
+                                log.info(body.toString());
                                 if(status.is2xxSuccessful()){
+                                    String tokenType = (String) body.get("token_type");
                                     String token = (String) body.get("access_token");
                                     String deviceId = (String) body.get("subject_id");
-                                    this.userRepository.save(UserEntity.epsonAuthenticationStore(user, token, deviceId));
+                                    this.userRepository.save(
+                                            UserEntity.epsonAuthenticationStore(user, tokenType + " "+ token, deviceId));
                                     return Mono.just(true);
                                 }
                                 else return Mono.just(false);
