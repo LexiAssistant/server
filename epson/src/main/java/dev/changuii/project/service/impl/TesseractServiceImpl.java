@@ -35,8 +35,6 @@ public class TesseractServiceImpl implements TesseractService {
 
         Tesseract tesseract = getTesseract();
 
-        System.out.println(f.getName() + " " + f.exists() + " " + f.canRead());
-        System.out.println(f.getPath());
         String result = null;
 
         if(f.exists() && f.canRead()) {
