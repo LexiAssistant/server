@@ -28,7 +28,7 @@ public class UserEntity implements UserDetails {
     private String epsonToken;
 
     @Column(name = "device_id")
-    private String deviceId;
+    private String deviceId; //subjectId
 
 
 

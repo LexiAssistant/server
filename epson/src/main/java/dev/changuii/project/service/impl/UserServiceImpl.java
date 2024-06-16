@@ -125,6 +125,7 @@ public class UserServiceImpl implements UserService {
                                     String deviceId = (String) body.get("subject_id");
                                     this.userRepository.save(
                                             UserEntity.epsonAuthenticationStore(user, tokenType + " "+ token, deviceId));
+                                    log.info("===================================EPSON TOKEN 발급=======================================");
                                     return Mono.just(true);
                                 }
                                 else return Mono.just(false);
