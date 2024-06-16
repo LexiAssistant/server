@@ -7,4 +7,6 @@ public interface UserService {
 
     TokenPairResponseDTO signup(UserDTO userDTO);
     TokenPairResponseDTO login(UserDTO userDTO);
+
+    public boolean epsonAuthentication(String printerEmail);
 }

@@ -27,6 +27,12 @@ public class UserEntity implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "epson_token")
+    private String epsonToken;
+
+    @Column(name = "device_id")
+    private String deviceId;
+
 
 
 

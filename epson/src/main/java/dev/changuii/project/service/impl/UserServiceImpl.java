@@ -67,4 +67,9 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenPairResponseDTO());
     }
 
+    @Override
+    public boolean epsonAuthentication(String printerEmail) {
+        return false;
+    }
+
 }
