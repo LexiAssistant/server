@@ -23,10 +23,6 @@ server:
       force: true
 
   # HTTP ssl 적용
-#  ssl:
-#    key-store: "classpath:{key}"
-#    key-store-type: PKCS12
-#    key-password:
 
 
 ---
@@ -42,7 +38,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -51,6 +47,7 @@ spring:
 
 server:
   host-name: http://scan-data.kro.kr/api/scan
+
 
 epson:
   api-key: 'OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA=='
@@ -78,6 +75,10 @@ spring:
 
 server:
   host-name: ${HOST_NAME}
+  ssl:
+    key-store: ${KEY_STORE}
+    key-store-type: PKCS12
+    key-store-password: ${KEY_STORE_PASS}
 
 epson:
   api-key: 'OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA=='
