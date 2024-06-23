@@ -7,10 +7,14 @@ spring:
   # multipart form-data 크기 지정
   servlet:
     multipart:
-      max-request-size: 50MB
-      max-file-size: 50MB
+      max-request-size: 1000MB
+      max-file-size: 1000MB
+
+
 
 server:
+  tomcat:
+    max-http-form-post-size: 1000MB
   port: 8080
   # Mock Mvc test response
   servlet:
@@ -45,6 +49,9 @@ spring:
         format_sql: true
 
 
+server:
+  host-name: http://scan-data.kro.kr/api/scan
+
 epson:
   api-key: 'OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA=='
 
@@ -68,8 +75,12 @@ spring:
       ddl-auto: update
     show-sql: false
 
+
+server:
+  host-name: ${HOST_NAME}
+
 epson:
-  api-key: Basic OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA==
+  api-key: 'OTc5ZmJkYTJlMGE0NGY5Yjk5NDdjMzc1MTJiOWJhMGU6R256SXVaYzcyYzBpb0N3dkR2SDY0NEttZjdTMHo2dXlvMHpXRkZXdTE2dTZ3aTY0Q1FVUXg0YzhyeFVCQjFKTA=='
 
 tesseract:
   jna-path: ${JNA_PATH}

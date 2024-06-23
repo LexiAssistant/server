@@ -37,6 +37,7 @@ public class ControllerAdvisor {
             RuntimeException.class
     })
     public ResponseEntity<String> exceptionHandler(Exception e){
+        e.printStackTrace();
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());

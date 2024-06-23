@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -24,6 +25,8 @@ public class QUserEntity extends EntityPathBase<UserEntity> {
     public final StringPath email = createString("email");
 
     public final StringPath epsonToken = createString("epsonToken");
+
+    public final ListPath<ImageEntity, QImageEntity> images = this.<ImageEntity, QImageEntity>createList("images", ImageEntity.class, QImageEntity.class, PathInits.DIRECT2);
 
     public final StringPath password = createString("password");
 
