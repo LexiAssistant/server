@@ -43,14 +43,12 @@ public class PrintServiceImpl implements PrintService {
 
     // 디바이스의 프린터 용량 체크
     @Override
-    public Mono<Boolean> getDevicePrintCapability(String email)
+    public Mono<String> getDevicePrintCapability(String email, String printType)
     {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
         log.info(user.toString());
         String deviceId = user.getDeviceId();
         String token = user.getEpsonToken();
-
-        String printType = "document";
 
         return webClient.get()
                 .uri(base+"/printing/printers/{deviceId}/capability/{printType}", deviceId, printType)// choose document or photo
@@ -63,9 +61,9 @@ public class PrintServiceImpl implements PrintService {
                                 log.info(body.toString());
                                 if(status.is2xxSuccessful()){
                                     log.info("디바이스 저장공간 확인 완료");
-                                    return Mono.just(true);
+                                    return Mono.just(body.toString());
                                 }
-                                else return Mono.just(false);
+                                else return Mono.just(body.toString());
                             });
                 });
 
@@ -74,7 +72,7 @@ public class PrintServiceImpl implements PrintService {
 
     //프린트 세팅
     @Override
-    public Mono<List<String>> printSetting(String email)
+    public Mono<List<String>> printSetting(String email, String printType)
     {
         log.info("============================ PRINT SETTING===================================");
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
@@ -86,7 +84,7 @@ public class PrintServiceImpl implements PrintService {
         PrintSettingDTO printSettingDTO = new PrintSettingDTO();
 
         printSettingDTO.setJob_name("sample");
-        printSettingDTO.setPrint_mode("photo");
+        printSettingDTO.setPrint_mode(printType); // document or photo
 
         Map<String, Object> printSetting = Map.of(
                 "media_size", "ms_a4",
@@ -153,7 +151,6 @@ public class PrintServiceImpl implements PrintService {
         log.info(filename.replace(".","") + " " + extension);
         return webClient.post()
                 .uri(uploadURL + "&File="+"1"+"."+extension)
-//                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .body(BodyInserters.fromDataBuffers(Mono.just(dataBuffer)))
                 .exchangeToMono(response -> {
@@ -175,9 +172,6 @@ public class PrintServiceImpl implements PrintService {
 
 
 
-
-
-
     @Override
     //프린트 실행
     public Mono<Boolean> executePrint(String email, String jobId){
@@ -190,31 +184,26 @@ public class PrintServiceImpl implements PrintService {
         log.info(deviceId);
         return webClient
                 .post()
-                .uri(base+"/printing/printers"+deviceId+"/jobs/"+jobId+"/print")
+                .uri(base + "/printing/printers/{deviceId}/jobs/{jobId}/print", deviceId, jobId)
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .exchangeToMono(response -> {
-                            HttpStatusCode status = response.statusCode();
-                            log.info(status.toString());
-                            return response.bodyToMono(LinkedHashMap.class)
-                                    .flatMap(body ->{
-                                        if(status.is2xxSuccessful()){
-                                            log.info("출력 시작");
-                                            log.info(body.toString());
-                                            return Mono.just(true);
-                                        }
-                                        else {
-                                            log.info(body.toString());
-                                            return Mono.just(false);} // TODO: 예외 던지도록 수정
+                    HttpStatusCode status = response.statusCode();
+                    log.info(status.toString());
 
-                                    });
+                    if (status.is2xxSuccessful()) {
+                        log.info("출력 시작");
+                        return Mono.just(true);
+                    } else {
+                        log.info("출력 실패: " + status.toString());
+                        return Mono.just(false);
+                    }
                 });
-
     }
 
 
     // get print job information
     @Override
-    public Mono<Boolean> getPrintJobInfo(String email, String jobId)
+    public Mono<String> getPrintJobInfo(String email, String jobId)
     {
         log.info("============================ PRINT JOB INFO ===============================");
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
@@ -231,12 +220,11 @@ public class PrintServiceImpl implements PrintService {
                     return response.bodyToMono(String.class)
                             .flatMap(body ->{
                                 if(status.is2xxSuccessful()){
-                                    log.info("출력 시작");
-                                    return Mono.just(true);
+                                    return Mono.just(body.toString());
                                 }
                                 else {
                                     log.info(body.toString());
-                                    return Mono.just(false);} // TODO: 예외 던지도록 수정
+                                    return Mono.just(body.toString());} // TODO: 예외 던지도록 수정
 
                             });
                 });
