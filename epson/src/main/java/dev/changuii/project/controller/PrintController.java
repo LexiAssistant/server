@@ -54,16 +54,19 @@ public class PrintController {
     }
 
     @PostMapping(value = "/{email}/execute/print/{jobId}")
-    public Mono<Boolean> executePrint(@PathVariable String jobId,
-                                      @PathVariable String email)
+    public Mono<Boolean> executePrint(@PathVariable("jobId") String jobId,
+                                      @PathVariable("email") String email)
     {
-        return printService.executePrint(jobId,email);
+        log.info("=-============== executePrint");
+        log.info(jobId);
+        log.info(email);
+        return printService.executePrint(email,jobId);
     }
 
 
     @GetMapping(value = "/job/info/{jobId}/{email}")
-    public Mono<Boolean> getJobInfo(@PathVariable String jobId,
-                                   @PathVariable String email)
+    public Mono<Boolean> getJobInfo(@PathVariable("jobId") String jobId,
+                                   @PathVariable("email") String email)
     {
         return printService.getPrintJobInfo(email, jobId);
     }
@@ -73,24 +76,22 @@ public class PrintController {
 
     @PostMapping("/test/{email}")
     public Mono<Boolean> test(@PathVariable("email") String email,
-                              @RequestParam MultipartFile file) throws IOException {
-        Mono<List<String>> res = printService.printSetting(email);
-        log.info(res.toString());
+                              @RequestParam("file") MultipartFile file) throws IOException {
+        String jobId = "";
+        String url = "";
+        List<String> data = printService.printSetting(email).block();
+        jobId = data.get(0);
+        url = data.get(1);
 
-        List<String> test = res.block();
+        log.info(jobId);
+        return printService.uploadFile(url, file);
 
-        assert test != null;
-        String jobId = test.get(0);
-        String uploadURL = test.get(1);
+//        return printService.executePrint(email, jobId);
 
-        printService.uploadFile(uploadURL,file);
 
-        log.info("\n jobID: " + jobId+ "\n uploadURL: " + uploadURL);
-
-        log.info(printService.executePrint(jobId,email).toString());
-
-        return printService.getPrintJobInfo(email, jobId);
     }
+
+
 
 
 

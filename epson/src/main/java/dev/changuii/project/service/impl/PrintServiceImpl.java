@@ -140,7 +140,7 @@ public class PrintServiceImpl implements PrintService {
 
 
         StringTokenizer st = new StringTokenizer(uploadURL, "?");
-        String url = st. nextToken();
+        String url = st.nextToken();
         String key = st.nextToken().replace("Key=", "");
 
         log.info("======================URL CHECK========================\n");
@@ -149,25 +149,26 @@ public class PrintServiceImpl implements PrintService {
 
         DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
         DataBuffer dataBuffer = bufferFactory.wrap(file.getBytes());
-
+        log.info(url + " " + key);
+        log.info(filename.replace(".","") + " " + extension);
         return webClient.post()
-                .uri(uploadURL + "&File="+filename+"."+extension)
-                .header(HttpHeaders.CONTENT_LENGTH, contentLength)
+                .uri(uploadURL + "&File="+"1"+"."+extension)
 //                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .body(BodyInserters.fromDataBuffers(Mono.just(dataBuffer)))
                 .exchangeToMono(response -> {
                     HttpStatusCode status = response.statusCode();
                     log.info(status.toString());
-                    return response.bodyToMono(String.class)
+                    return response.bodyToMono(Void.class)
                             .flatMap(body -> {
-                                log.info(body);
-                                log.info("업로드 완료");
-                                if(status.is2xxSuccessful()){
-                                    log.info("업로드 완료");
+                                log.info("Inside flatMap"); // 로그 추가
+                                if (status.is2xxSuccessful()) {
+                                    log.info("Upload completed successfully");
                                     return Mono.just(true);
+                                } else {
+                                    log.warn("Upload failed with status: " + status);
+                                    return Mono.just(false);
                                 }
-                                else return Mono.just(false);
                             });
                 });
     }
@@ -177,7 +178,7 @@ public class PrintServiceImpl implements PrintService {
 
 
 
-
+    @Override
     //프린트 실행
     public Mono<Boolean> executePrint(String email, String jobId){
         log.info("============================ EXECUTE PRINT===================================");
@@ -189,15 +190,16 @@ public class PrintServiceImpl implements PrintService {
         log.info(deviceId);
         return webClient
                 .post()
-                .uri(base+"/printing/printers/{deviceId}/jobs/{jobId}/print", deviceId, jobId)
+                .uri(base+"/printing/printers"+deviceId+"/jobs/"+jobId+"/print")
                 .header(HttpHeaders.AUTHORIZATION, token)
                 .exchangeToMono(response -> {
                             HttpStatusCode status = response.statusCode();
                             log.info(status.toString());
-                            return response.bodyToMono(String.class)
+                            return response.bodyToMono(LinkedHashMap.class)
                                     .flatMap(body ->{
                                         if(status.is2xxSuccessful()){
                                             log.info("출력 시작");
+                                            log.info(body.toString());
                                             return Mono.just(true);
                                         }
                                         else {
