@@ -10,6 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class TesseractServiceImpl implements TesseractService {
@@ -49,6 +52,26 @@ public class TesseractServiceImpl implements TesseractService {
         return result;
     }
 
+    @Override
+    public String imageToString(byte[] mfile) throws IOException {
+        File f = this.multipartFileToFile(mfile);
+
+        Tesseract tesseract = getTesseract();
+
+        String result = null;
+
+        if(f.exists() && f.canRead()) {
+            try {
+                result = tesseract.doOCR(f);
+            } catch (TesseractException e) {
+                result = e.getMessage();
+            }
+        } else {
+            result = "not exist";
+        }
+        return result;
+    }
+
     private Tesseract getTesseract() {
 
         Tesseract instance = new Tesseract();
@@ -63,6 +86,12 @@ public class TesseractServiceImpl implements TesseractService {
     private File multipartFileToFile(MultipartFile mfile) throws IOException {
         File f = new File(filePath + mfile.getOriginalFilename());
         mfile.transferTo(f);
+        return f;
+    }
+    private File multipartFileToFile(byte[] mfile) throws IOException {
+        Path p = Paths.get(filePath + "tessimage.jpg");
+        Files.write(p, mfile);
+        File f = p.toFile();
         return f;
     }
 }

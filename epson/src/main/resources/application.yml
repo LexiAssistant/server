@@ -7,14 +7,14 @@ spring:
   # multipart form-data 크기 지정
   servlet:
     multipart:
-      max-request-size: 1000MB
-      max-file-size: 1000MB
+      max-request-size: 10MB
+      max-file-size: 10MB
 
 
 
 server:
   tomcat:
-    max-http-form-post-size: 1000MB
+    max-http-form-post-size: 10MB
   port: 8080
   # Mock Mvc test response
   servlet:
@@ -55,7 +55,7 @@ epson:
 tesseract:
   jna-path: /opt/homebrew/opt/tesseract/lib
   language-path : /Users/chlee/Downloads/tessdata_best
-  file-path : /Users/chlee/Downloads/
+  file-path : /Users/chlee/Desktop/2024project/epson
 ---
 # prod
 spring:
