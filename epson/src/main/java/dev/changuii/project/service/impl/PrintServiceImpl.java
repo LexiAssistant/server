@@ -5,29 +5,21 @@ import dev.changuii.project.entity.UserEntity;
 import dev.changuii.project.exception.CustomException;
 import dev.changuii.project.repository.UserRepository;
 import dev.changuii.project.service.PrintService;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MimeType;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.print.attribute.standard.MediaSize;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -42,9 +34,11 @@ public class PrintServiceImpl implements PrintService {
 
     public PrintServiceImpl(@Autowired WebClient.Builder webClient, UserRepository userRepository) {
         
-        this. webClient = webClient.baseUrl("https://api.epsonconnect.com/api/1").build();
+        this. webClient = webClient.build();
         this.userRepository = userRepository;
     }
+
+    private final String base = "https://api.epsonconnect.com/api/1";
 
 
     // 디바이스의 프린터 용량 체크
@@ -54,21 +48,13 @@ public class PrintServiceImpl implements PrintService {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
         log.info(user.toString());
         String deviceId = user.getDeviceId();
-
-        String[] words = user.getEpsonToken().split(" ");
-
-        String tokenType = words[0];
-        String token = words[1];
+        String token = user.getEpsonToken();
 
         String printType = "document";
-//        81cbb3f5ff6749e3948ba62e0dfcae2a
-//        eroHCNqhq1q6dyociTcPOov2BYuXOyEH04K3VWfDOguYGRD9iIjZknMaW1Duw9dA
+
         return webClient.get()
-//                .uri("/printing/printers/{deviceId}/capability/{print_mode}",deviceId, printType)
-                .uri("/printing/printers/{deviceId}/capability/{printType}", deviceId, printType)
-                // choose document or photo
-//                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .uri(base+"/printing/printers/{deviceId}/capability/{printType}", deviceId, printType)// choose document or photo
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .exchangeToMono(response -> {
                     HttpStatusCode status = response.statusCode();
                     log.info(status.toString());
@@ -90,17 +76,18 @@ public class PrintServiceImpl implements PrintService {
     @Override
     public Mono<List<String>> printSetting(String email)
     {
+        log.info("============================ PRINT SETTING===================================");
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
         log.info(user.toString());
 
-        String[] words = user.getEpsonToken().split(" ");
-        String tokenType = words[0];
-        String token = words[1];
+        String token = user.getEpsonToken();
 
         String deviceId = user.getDeviceId();
         PrintSettingDTO printSettingDTO = new PrintSettingDTO();
+
         printSettingDTO.setJob_name("sample");
         printSettingDTO.setPrint_mode("photo");
+
         Map<String, Object> printSetting = Map.of(
                 "media_size", "ms_a4",
                 "media_type", "mt_plainpaper",
@@ -118,8 +105,8 @@ public class PrintServiceImpl implements PrintService {
 
 
         return webClient.post()
-                .uri("/printing/printers/{deviceId}/jobs", deviceId)
-                .header(HttpHeaders.AUTHORIZATION,"Bearer "+ token)
+                .uri(base+"/printing/printers/{deviceId}/jobs", deviceId)
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .header(HttpHeaders.CONTENT_TYPE, String.valueOf(MediaType.APPLICATION_JSON))
                 .bodyValue(printSettingDTO)
                 .exchangeToMono(response -> {
@@ -139,102 +126,119 @@ public class PrintServiceImpl implements PrintService {
                 });
     }
 
-    public Mono<Boolean> uploadFile(String uploadURL, MultipartFile file) {
-        String extension = "jpeg";
+
+    @Override
+    public Mono<Boolean> uploadFile(String uploadURL, MultipartFile file) throws IOException {
+        log.info("============================ UPLOAD FILE===================================");
+        String extension = file.getContentType().split("/")[1];
         String contentLength = String.valueOf(file.getSize());
-        String contentType = file.getContentType();
+        String filename = file.getOriginalFilename();
 
-        ByteArrayResource resource;
-        try {
-            resource = new ByteArrayResource(file.getBytes()) {
-                @Override
-                public String getFilename() {
-                    return file.getOriginalFilename();
-                }
-            };
-        } catch (IOException e) {
-            return Mono.error(e);
-        }
+        log.info("================================= FILE INFO ========================================");
+        log.info("\n extension: " + extension + "\n contentLength: " + contentLength + "\n filename: " + filename); ;
+        log.info("================================= FILE INFO ========================================");
 
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        formData.add("1.jpeg", resource);
 
+        StringTokenizer st = new StringTokenizer(uploadURL, "?");
+        String url = st. nextToken();
+        String key = st.nextToken().replace("Key=", "");
+
+        log.info("======================URL CHECK========================\n");
+        log.info(url); log.info(key);
         log.info("======================URL CHECK========================");
-        log.info(uploadURL);
+
+        DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
+        DataBuffer dataBuffer = bufferFactory.wrap(file.getBytes());
 
         return webClient.post()
-                .uri(uploadURL)
+                .uri(uploadURL + "&File="+filename+"."+extension)
                 .header(HttpHeaders.CONTENT_LENGTH, contentLength)
-//                .contentType(MediaType.IMAGE_JPEG)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(BodyInserters.fromMultipartData(formData))
-                .retrieve()
-                .bodyToMono(LinkedHashMap.class)
-                .flatMap(body -> {
-                    Integer status = (Integer) body.get("status");
+//                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .body(BodyInserters.fromDataBuffers(Mono.just(dataBuffer)))
+                .exchangeToMono(response -> {
+                    HttpStatusCode status = response.statusCode();
                     log.info(status.toString());
-                    if (status != null && status >= 200 && status < 300) {
-                        return Mono.just(true);
-                    } else {
-                        return Mono.just(false);
-                    }
+                    return response.bodyToMono(String.class)
+                            .flatMap(body -> {
+                                log.info(body);
+                                log.info("업로드 완료");
+                                if(status.is2xxSuccessful()){
+                                    log.info("업로드 완료");
+                                    return Mono.just(true);
+                                }
+                                else return Mono.just(false);
+                            });
                 });
     }
 
 
-    private static class MultipartFileResource extends ByteArrayResource {
-        private final String filename;
-
-        public MultipartFileResource(MultipartFile file) {
-            super(getBytes(file));
-            this.filename = file.getOriginalFilename();
-        }
-
-        @Override
-        public String getFilename() {
-            return this.filename;
-        }
-
-        private static byte[] getBytes(MultipartFile file) {
-            try {
-                return file.getBytes();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to read file bytes", e);
-            }
-        }
-    }
 
 
 
 
 
     //프린트 실행
-    public Mono<Boolean> excutePrint(String jobId, String email){
+    public Mono<Boolean> executePrint(String email, String jobId){
+        log.info("============================ EXECUTE PRINT===================================");
         UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
 
-        String[] words = user.getEpsonToken().split(" ");
-        String tokenType = words[0];
-        String token = words[1];
+        String token = user.getEpsonToken();
         String deviceId = user.getDeviceId();
-
-        return webClient.post().uri("printing/printers/{deviceId}/jobs/{jobId}", deviceId, jobId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+        log.info(token);
+        log.info(deviceId);
+        return webClient
+                .post()
+                .uri(base+"/printing/printers/{deviceId}/jobs/{jobId}/print", deviceId, jobId)
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .exchangeToMono(response -> {
                             HttpStatusCode status = response.statusCode();
                             log.info(status.toString());
-                            return response.bodyToMono(LinkedHashMap.class)
+                            return response.bodyToMono(String.class)
                                     .flatMap(body ->{
                                         if(status.is2xxSuccessful()){
                                             log.info("출력 시작");
                                             return Mono.just(true);
                                         }
-                                        else return Mono.just(false); // TODO: 예외 던지도록 수정
+                                        else {
+                                            log.info(body.toString());
+                                            return Mono.just(false);} // TODO: 예외 던지도록 수정
+
                                     });
                 });
+
     }
 
 
     // get print job information
+    @Override
+    public Mono<Boolean> getPrintJobInfo(String email, String jobId)
+    {
+        log.info("============================ PRINT JOB INFO ===============================");
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(CustomException::new);
+        String token = user.getEpsonToken();
+        String deviceId = user.getDeviceId();
+
+        return webClient
+                .get()
+                .uri(base + "/printing/printers/{device_id}/jobs/{jobId}",deviceId ,jobId)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .exchangeToMono(response -> {
+                    HttpStatusCode status = response.statusCode();
+                    log.info(status.toString());
+                    return response.bodyToMono(String.class)
+                            .flatMap(body ->{
+                                if(status.is2xxSuccessful()){
+                                    log.info("출력 시작");
+                                    return Mono.just(true);
+                                }
+                                else {
+                                    log.info(body.toString());
+                                    return Mono.just(false);} // TODO: 예외 던지도록 수정
+
+                            });
+                });
+    }
 
 
 }

@@ -11,6 +11,7 @@ public interface PrintService {
     Mono<Boolean> getDevicePrintCapability(String email);
 
     Mono<List<String>> printSetting(String email);
-    Mono<Boolean> uploadFile(String uploadURL, MultipartFile file);
-//    Mono<Boolean> excutePrint(String jobId, String email);
+    Mono<Boolean> uploadFile(String uploadURL, MultipartFile file) throws IOException;
+    Mono<Boolean> executePrint(String jobId, String email);
+    Mono<Boolean> getPrintJobInfo(String email, String jobId);
 }

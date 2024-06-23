@@ -26,8 +26,8 @@ public class JwtProvider {
     //TODO: 환경변수로 바꿔야함
     private String secretKey = "598552aaff8e56c91489540619ab3cb62fa2ae044a1158b9562464a606f9e820";
 
-    private final long accessTokenValidMillisecond = 1000L * 10 * 60; // 10분
-    private final long refreshTokenValidMillisecond = 1000L * 60 * 60; // 1시간
+    private final long accessTokenValidMillisecond = 1000L * 10 * 60 * 60; // 10분
+    private final long refreshTokenValidMillisecond = 1000L * 60 * 60 * 60; // 1시간
 
     private final UserDetailsService userDetailsService;
 

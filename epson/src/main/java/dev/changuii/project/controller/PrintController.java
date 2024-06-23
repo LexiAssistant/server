@@ -3,8 +3,6 @@ package dev.changuii.project.controller;
 
 import dev.changuii.project.service.PrintService;
 import dev.changuii.project.service.UserService;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -31,9 +30,8 @@ public class PrintController {
     }
 
 
-    @PostMapping(value = "{email}/check/capability/{printerEmail}")
-    public Mono<Boolean> checkDeviceCapability(@PathVariable(name = "email") String email,
-                                      @PathVariable(name = "printerEmail") String printerEmail) {
+    @GetMapping(value = "{email}/check/capability")
+    public Mono<Boolean> checkDeviceCapability(@PathVariable(name = "email") String email) {
         return printService.getDevicePrintCapability(email);
     }
 
@@ -43,16 +41,57 @@ public class PrintController {
     {
         Mono<List<String>> res = printService.printSetting(email);
         log.info(res.toString());
+
         return res;
     }
 
     @PostMapping(value = "/file/upload")
     public Mono<Boolean> printFileUpload(@RequestParam String uploadURL,
-                                         @RequestPart MultipartFile file) {
+                                         @RequestParam MultipartFile file) throws IOException {
         log.info(uploadURL);
         log.info(file.getOriginalFilename());
         return printService.uploadFile(uploadURL,file);
     }
+
+    @PostMapping(value = "/{email}/execute/print/{jobId}")
+    public Mono<Boolean> executePrint(@PathVariable String jobId,
+                                      @PathVariable String email)
+    {
+        return printService.executePrint(jobId,email);
+    }
+
+
+    @GetMapping(value = "/job/info/{jobId}/{email}")
+    public Mono<Boolean> getJobInfo(@PathVariable String jobId,
+                                   @PathVariable String email)
+    {
+        return printService.getPrintJobInfo(email, jobId);
+    }
+
+
+
+
+    @PostMapping("/test/{email}")
+    public Mono<Boolean> test(@PathVariable("email") String email,
+                              @RequestParam MultipartFile file) throws IOException {
+        Mono<List<String>> res = printService.printSetting(email);
+        log.info(res.toString());
+
+        List<String> test = res.block();
+
+        assert test != null;
+        String jobId = test.get(0);
+        String uploadURL = test.get(1);
+
+        printService.uploadFile(uploadURL,file);
+
+        log.info("\n jobID: " + jobId+ "\n uploadURL: " + uploadURL);
+
+        log.info(printService.executePrint(jobId,email).toString());
+
+        return printService.getPrintJobInfo(email, jobId);
+    }
+
 
 
 
