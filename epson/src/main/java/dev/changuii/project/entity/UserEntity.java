@@ -31,7 +31,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "device_id")
     private String deviceId; //subjectId
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user") @Builder.Default
     private List<ImageEntity> images = new ArrayList<>();
 
 
