@@ -25,7 +25,7 @@ public class ScanController {
         this.scanService = scanService;
     }
 
-
+    // 등록
     @PostMapping("/regi/{email}")
     public Mono<ResponseEntity<Boolean>> authenticationAndRegistration(
             @PathVariable("email") String email
